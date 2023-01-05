@@ -1,4 +1,5 @@
 import mongoose, { Document } from "mongoose";
+import shortid from "shortid";
 import { IUser } from "./User";
 
 
@@ -18,6 +19,7 @@ const UserSchema = new mongoose.Schema<IShortenLink>({
   },
   code: {
     type: String,
+    default: shortid.generate,
     required: true,
     minlength: 3,
     maxlength: 128,
