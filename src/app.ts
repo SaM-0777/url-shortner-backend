@@ -5,6 +5,8 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import path from "path";
 
+import AuthRouter from "./routes/auth";
+
 
 dotenv.config({path: path.join(__dirname, '..', '.env')})
 
@@ -19,6 +21,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 // routes
+app.use("/auth", AuthRouter);
 app.get("/", (req, res) => {
   res.send("Hello World!")
 });
