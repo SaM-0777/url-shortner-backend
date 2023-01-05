@@ -25,7 +25,7 @@ app.use(morgan("dev"));
 app.use("/auth", AuthRouter);
 app.use("/api", APIRouter);
 app.get("/", (req, res) => {
-  res.send("Hello World!")
+  res.status(404).send("<h1>404</h1>")
 });
 
 // DB config
