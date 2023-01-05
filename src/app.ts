@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 import AuthRouter from "./routes/auth";
+import APIRouter from "./routes/api";
 
 
 dotenv.config({path: path.join(__dirname, '..', '.env')})
@@ -22,6 +23,7 @@ app.use(morgan("dev"));
 
 // routes
 app.use("/auth", AuthRouter);
+app.use("/api", APIRouter);
 app.get("/", (req, res) => {
   res.send("Hello World!")
 });

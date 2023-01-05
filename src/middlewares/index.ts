@@ -1,11 +1,12 @@
 import { findUserByUsername, findUserByUsernameLogin } from "./auth";
-
+import { authorizeRequest } from "./api";
 
 export {
-  // Login
+  // Auth
   findUserByUsername,
   findUserByUsernameLogin,
 
-  
+  // API
+  authorizeRequest,
 };
 
