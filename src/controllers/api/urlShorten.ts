@@ -1,15 +1,15 @@
-import express, { Request, Response } from "express";
-import { func } from "joi";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
+import shortid from "shortid";
 import { ShortenLink } from "../../models";
 
 
 export async function createShortenUrl(req: Request, res: Response) {
-  const { userid, redirectUrl } = req.body
-  // validate userid
+  const { redirectUrl, verifiedUser } = req.body
+  const { id } = verifiedUser
   try {
     const newShortenUrl = new ShortenLink({
-      user: new mongoose.Types.ObjectId(userid),
+      user: new mongoose.Types.ObjectId(id),
       redirectUrl: redirectUrl
     })
     newShortenUrl.save()
@@ -21,11 +21,13 @@ export async function createShortenUrl(req: Request, res: Response) {
 
 
 export async function deleteShortenUrl(req: Request, res: Response) {
-  const { shortenUrlObjectId } = req.body
+  const { shortenUrlObjectId, verifiedUser } = req.body
+  const { id } = verifiedUser
   let shortenUrl
   try {
     shortenUrl = await ShortenLink.findById({ _id: shortenUrlObjectId })
     if (!shortenUrl) return res.status(400).json({ error: "Invalid Request" })
+    if (shortenUrl.user.toString() != new mongoose.Types.ObjectId(id).toString()) return res.status(404).json({ DeleteShortenUrlObjectUnexpectedUserError: "Request denied" })
   } catch (error) {
     res.status(500).json({ DeleteShortenUrlFindExistingShortenUrlObjectError: "Requested object do not exist" })
   }
@@ -39,15 +41,17 @@ export async function deleteShortenUrl(req: Request, res: Response) {
 
 
 export async function updateShortenUrl(req: Request, res: Response) {
-  const { shortenUrlObjectId, redirectUrl } = req.body
-  let shortenUrl
+  const { shortenUrlObjectId, redirectUrl, verifiedUser } = req.body
+  const { id } = verifiedUser
   try {
-    shortenUrl = await ShortenLink.findById({ _id: shortenUrlObjectId })
+    const shortenUrl = await ShortenLink.findById({ _id: shortenUrlObjectId })
     if (!shortenUrl) return res.status(400).json({ ObjectToUpdateNotFoundError: "Requested object not found" })
+    if (shortenUrl.user.toString() !== new mongoose.Types.ObjectId(id).toString()) return res.status(404).json({ UpdateShortenUrlObjectUnexpectedUserError: "Request denied" })
     shortenUrl.redirectUrl = redirectUrl || shortenUrl.redirectUrl
+    shortenUrl.code = shortid.generate()
     shortenUrl.updatedAt = new Date(Date.now())
     await shortenUrl.save()
-    res.status(200).json({ success: "Updated successfully" })
+    res.status(200).json({ shortenUrl })
   } catch (error) {
     res.status(500).json({ UpdateShortenUrlFindExistingShortenUrlObjectError: "Requested object can not be updated right now." })
   }
@@ -55,10 +59,12 @@ export async function updateShortenUrl(req: Request, res: Response) {
 
 
 export async function getShortenUrlById(req:Request, res: Response) {
-  const { shortenUrlObjectId } = req.body
+  const { shortenUrlObjectId, verifiedUser } = req.body
+  const { id } = verifiedUser
   try {
     const shortenUrl = await ShortenLink.findById({ _id: shortenUrlObjectId })
     if (!shortenUrl) return res.status(400).json({ ObjectToGetByIdNotFoundError: "Requested object not found" })
+    if (shortenUrl.user.toString() !== new mongoose.Types.ObjectId(id).toString()) return res.status(404).json({ GetByIdShortenUrlObjectUnexpectedUserError: "Request denied" })
     res.status(200).json({ shortenUrl })
   } catch (error) {
     res.status(500).json({ FindExistingShortenUrlObjectError: "Requested object can not be found right now." })
@@ -67,15 +73,16 @@ export async function getShortenUrlById(req:Request, res: Response) {
 
 
 export async function getShortenUrlByUser(req:Request, res: Response) {
-  const { userid } = req.body
+  const { verifiedUser } = req.body
+  const { id } = verifiedUser
   const query = ShortenLink.aggregate([
     {
-      "$match": {user: new mongoose.Types.ObjectId(userid)}
+      "$match": {user: new mongoose.Types.ObjectId(id)}
     }
   ])
 
   query.exec(function (err, response) {
-    if (err) res.status(400).json({ GetShortenUrlByUserError: err })
+    if (err) res.status(400).json({ GetShortenUrlByUserError: "Not found" })
     res.status(200).json({ response })
   })
 };
