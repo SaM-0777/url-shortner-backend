@@ -5,8 +5,7 @@
   "main": "dist",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "tsnd src/app.ts --respawn --transpile-only --exit-child",
-    "build": "tsc -p ."
+    "dev": "tsnd src/app.ts --respawn --transpile-only --exit-child"
   },
   "repository": {
     "type": "git",
