@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist",
   "scripts": {
-    "start": "npm run build && node dist/app.js",
+    "start": "node dist/app.js",
     "dev": "tsnd src/app.ts --respawn --transpile-only --exit-child",
     "build": "tsc -p ."
   },
