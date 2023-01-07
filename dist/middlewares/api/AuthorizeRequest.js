@@ -22,7 +22,7 @@ function authorizeRequest(req, res, next) {
         const token = req.header('auth-token');
         if (!token)
             return res.status(403).json({ RequestAuth: "Access Denied" });
-        // console.log(JWT_SECRET, typeof JWT_SECRET)
+        console.log(JWT_SECRET, typeof JWT_SECRET);
         // async
         jsonwebtoken_1.default.verify(token, JWT_SECRET, (error, verified) => {
             if (error)
