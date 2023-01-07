@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "npm run build && node dist/app.js",
     "dev": "tsnd src/app.ts --respawn --transpile-only --exit-child",
-    "build": "tsc"
+    "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.2",
     "morgan": "^1.10.0",
-    "shortid": "^2.2.16"
+    "shortid": "^2.2.16",
+    "tsc": "^2.0.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
